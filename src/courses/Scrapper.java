@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Scrapper {
-    public static Course[] courses = new Course[DatabaseBuilder.cap];
+    public static Course[] courses = new Course[DatabaseBuilder.coursecap];
     private static int counter = 0;
     private static String log = "";
 
@@ -25,7 +25,7 @@ public class Scrapper {
                     courses[counter] = scrapCourse(courseURL);
                     log("Progress : " + counter++);
 
-                    if(counter >= DatabaseBuilder.cap) return;
+                    if(counter >= DatabaseBuilder.coursecap) return;
                 }
             }
         } catch(Exception e){
@@ -34,7 +34,8 @@ public class Scrapper {
     }
 
     public static Course scrapCourse(String url) throws IOException {
-        String title = "", id = "", credits = "", description = "", prereq = "", coreq = "", notes = "", faculty = "";
+        String title = "", id = "", credits = "", description = "", prereq = "", coreq = "", notes = "", faculty = "",
+                restrictions = "", terms = "", profs = "";
 
 
         Document coursePage = Jsoup.connect(url).get();
@@ -62,7 +63,7 @@ public class Scrapper {
             credits = headerSplit[headerSplit.length - 2].replace("(", ""); //Credit
             if(credits.trim().length() > 1) credits = "";
         } catch (Exception e){
-            log("Course " + counter + ": An error with Title, credit or ID occured");
+            log("Course " + counter + ": An error with Title, credit or ID occured - " + e.getMessage());
         }
 
         Element body = coursePage.select("div.node-catalog").first(); // Selects the div that contains the rest of the information
@@ -77,7 +78,24 @@ public class Scrapper {
             description = body.selectFirst("div.content").selectFirst("p").text();
             if(description.contains(":")) description = description.split(":")[1];
         } catch (Exception e) {
-            log("Course " + counter + ": An error with Description occured");
+            log("Course " + counter + ": An error with Description occured - " + e.getMessage());
+        }
+
+        try {
+            String termbox = body.selectFirst("p.catalog-terms").text();
+
+            if(termbox.contains("not scheduled")) terms = "Not Scheduled";
+            else terms = termbox.split(":")[1];
+        } catch (Exception e) {
+            log("Course " + counter + ": An error with Terms occured - " + e.getMessage());
+        }
+
+        try {
+            String profbox = body.selectFirst("p.catalog-instructors").text();
+
+            if(!profbox.contains("no professors")) profs = profbox.split(":")[1];
+        } catch (Exception e) {
+            log("Course " + counter + ": An error with Profs occured - " + e.getMessage());
         }
 
         try{
@@ -90,6 +108,8 @@ public class Scrapper {
                     prereq += text.split(":")[1] + " | ";    // Get Prerequisites
                 } else if (text.startsWith("Coreq")) {
                     coreq += text.split(":")[1] + " | ";     // Get Corequisites
+                } else if (text.startsWith("Restr")) {
+                    coreq += text.split(":")[1] + " | ";     // Get Restrictions
                 } else {
                     notes += text + " | ";                        // Get Additional Notes
                 }
@@ -99,11 +119,12 @@ public class Scrapper {
             if (!prereq.isEmpty()) prereq = prereq.substring(0, prereq.length() - 2);
             if (!coreq.isEmpty()) coreq = coreq.substring(0, coreq.length() - 2);
             if (!notes.isEmpty()) notes = notes.substring(0, notes.length() - 2);
+            if (!restrictions.isEmpty()) restrictions = restrictions.substring(0, restrictions.length() - 2);
         } catch (Exception e) {
-            log("Course " + counter + ": An error with Prereq, Coreq or Notes occured");
+            log("Course " + counter + ": An error with Notes occured - " + e.getMessage());
         }
 
-        return new Course(title, id, credits, description, prereq, coreq, notes, faculty);
+        return new Course(title, id, credits, description, prereq, coreq, notes, faculty, restrictions, terms, profs);
     }
 
     static void log(String message){

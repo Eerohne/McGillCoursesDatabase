@@ -8,7 +8,10 @@ import java.io.IOException;
 
 public class DatabaseBuilder {
     static final String fileName = "mcgillCourses";
-    static final int cap = 10331;
+    static final int coursecap = 10331;
+    static final String year = "2022-2023";
+    static final String school = "McGill";
+
 
     public static void main(String[] args) throws IOException {
         Scrapper.retrieveData();
@@ -16,7 +19,7 @@ public class DatabaseBuilder {
         try {
             Scrapper.outputLog();
             makeJSON();
-            makeCSV();
+            makeTSV();
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -29,6 +32,8 @@ public class DatabaseBuilder {
         }
 
         JsonObject db = new JsonObject();
+        db.put("school", school);
+        db.put("year", year);
         db.put("courses", courseArray);
 
         FileWriter file = new FileWriter(fileName + ".json");
@@ -36,13 +41,13 @@ public class DatabaseBuilder {
         file.flush();
     }
 
-    private static void makeCSV() throws IOException{
-        String db = "";
+    private static void makeTSV() throws IOException{
+        String db = "title\tid\tcredits\tdescription\tprereq\tcoreq\tnotes\tfaculty\trestrictions\tterms\tprofs";
         for (int i = 0; i < Scrapper.courses.length; i++) {
-            db += Scrapper.courses[i].toCSV() + "\n";
+            db += Scrapper.courses[i].toTSV() + "\n";
         }
 
-        FileWriter file = new FileWriter(fileName + ".csv");
+        FileWriter file = new FileWriter(fileName + ".tsv");
         file.write(db);
         file.flush();
     }
