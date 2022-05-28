@@ -8,9 +8,10 @@ import java.io.IOException;
 
 public class DatabaseBuilder {
     static final String fileName = "mcgillCourses";
+    static final int cap = 300;
 
     public static void main(String[] args) throws IOException {
-        Scrapper.courses[0] =  Scrapper.scrapCourse("https://www.mcgill.ca/study/2022-2023/courses/comp-400");
+        Scrapper.retrieveData();
 
         try {
             makeJSON();
