@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 
 public class Scrapper {
-    public static Course[] courses = new Course[1];
+    public static Course[] courses = new Course[10331];
     private static int counter = 0;
 
     static Course[] retrieveData(){
