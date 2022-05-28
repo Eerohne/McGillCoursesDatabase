@@ -18,6 +18,8 @@ public class Course {
         this.coreq = coreq.trim();
         this.notes = notes.trim();
         this.faculty = faculty.trim();
+
+        if(this.title.isEmpty()) this.title = this.id;
     }
 
     public JsonObject toJSON(){

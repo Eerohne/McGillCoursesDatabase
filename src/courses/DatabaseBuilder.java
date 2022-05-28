@@ -8,12 +8,13 @@ import java.io.IOException;
 
 public class DatabaseBuilder {
     static final String fileName = "mcgillCourses";
-    static final int cap = 300;
+    static final int cap = 10331;
 
     public static void main(String[] args) throws IOException {
         Scrapper.retrieveData();
 
         try {
+            Scrapper.outputLog();
             makeJSON();
             makeCSV();
         } catch (IOException e){

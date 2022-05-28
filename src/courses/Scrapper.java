@@ -4,11 +4,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class Scrapper {
     public static Course[] courses = new Course[DatabaseBuilder.cap];
     private static int counter = 0;
+    private static String log = "";
 
     static void retrieveData(){
         String baseURL = "https://www.mcgill.ca/study/2022-2023/courses/search?page=";
@@ -21,7 +23,7 @@ public class Scrapper {
                     String courseURL = "https://www.mcgill.ca" + courseBox.select("a").first().attr("href");
 
                     courses[counter] = scrapCourse(courseURL);
-                    System.out.println("Progress : " + counter++);
+                    log("Progress : " + counter++);
 
                     if(counter >= DatabaseBuilder.cap) return;
                 }
@@ -58,9 +60,9 @@ public class Scrapper {
             }
 
             credits = headerSplit[headerSplit.length - 2].replace("(", ""); //Credit
-
+            if(credits.trim().length() > 1) credits = "";
         } catch (Exception e){
-            System.out.println("Course " + counter + ": An error with Title, credit or ID occured");
+            log("Course " + counter + ": An error with Title, credit or ID occured");
         }
 
         Element body = coursePage.select("div.node-catalog").first(); // Selects the div that contains the rest of the information
@@ -68,13 +70,14 @@ public class Scrapper {
         try {
             faculty = body.select("a").first().text(); // Faculty
         } catch (Exception e) {
-            System.out.println("Course " + counter + ": An error with Faculty occured");
+            log("Course " + counter + ": An error with Faculty occured");
         }
 
         try {
-            description = body.select("div.content").first().select("p").first().text().split(":")[1];
+            description = body.selectFirst("div.content").selectFirst("p").text();
+            if(description.contains(":")) description = description.split(":")[1];
         } catch (Exception e) {
-            System.out.println("Course " + counter + ": An error with Description occured");
+            log("Course " + counter + ": An error with Description occured");
         }
 
         try{
@@ -97,9 +100,20 @@ public class Scrapper {
             if (!coreq.isEmpty()) coreq = coreq.substring(0, coreq.length() - 2);
             if (!notes.isEmpty()) notes = notes.substring(0, notes.length() - 2);
         } catch (Exception e) {
-            System.out.println("Course " + counter + ": An error with Prereq, Coreq or Notes occured");
+            log("Course " + counter + ": An error with Prereq, Coreq or Notes occured");
         }
 
         return new Course(title, id, credits, description, prereq, coreq, notes, faculty);
+    }
+
+    static void log(String message){
+        System.out.println(message);
+        log += message + "\n";
+    }
+
+    public static void outputLog() throws IOException {
+        FileWriter file = new FileWriter("log.log");
+        file.write(log);
+        file.flush();
     }
 }
