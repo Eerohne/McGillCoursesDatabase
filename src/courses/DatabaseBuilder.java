@@ -6,8 +6,11 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Main class to build the Data files
+ */
 public class DatabaseBuilder {
-    static final String fileName = "mcgillCourses";
+    static final String fileName = "courses";
     static final int coursecap = 10331;
     static final String year = "2022-2023";
     static final String school = "McGill";

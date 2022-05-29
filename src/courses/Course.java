@@ -36,6 +36,8 @@ public class Course {
         course.put("notes", notes);
         course.put("faculty", faculty);
         course.put("restrictions", restrictions);
+        course.put("terms", terms);
+        course.put("profs", profs);
 
         return course;
     }
