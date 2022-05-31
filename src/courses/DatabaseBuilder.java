@@ -31,6 +31,7 @@ public class DatabaseBuilder {
     private static void makeJSON() throws IOException{
         JsonArray courseArray = new JsonArray();
         for (int i = 0; i < Scrapper.courses.length; i++) {
+            if(Scrapper.courses[i] == null) break;
             courseArray.add(Scrapper.courses[i].toJSON());
         }
 
@@ -45,8 +46,9 @@ public class DatabaseBuilder {
     }
 
     private static void makeTSV() throws IOException{
-        String db = "title\tid\tcredits\tdescription\tprereq\tcoreq\tnotes\tfaculty\trestrictions\tterms\tprofs";
+        String db = "title\tid\tcredits\tdescription\tprereq\tcoreq\tnotes\tfaculty\trestrictions\tterms\tprofs\n";
         for (int i = 0; i < Scrapper.courses.length; i++) {
+            if(Scrapper.courses[i] == null) break;
             db += Scrapper.courses[i].toTSV() + "\n";
         }
 

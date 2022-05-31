@@ -22,7 +22,7 @@ public class Scrapper {
                 for(Element courseBox : searchPage.select("div.views-field-field-course-title-long")){
                     String courseURL = "https://www.mcgill.ca" + courseBox.select("a").first().attr("href");
 
-                    courses[counter] = scrapCourse(courseURL);
+                    courses[counter] = scrapeCourse(courseURL);
                     log("Progress : " + counter++);
 
                     if(counter >= DatabaseBuilder.coursecap) return;
@@ -33,7 +33,15 @@ public class Scrapper {
         }
     }
 
-    public static Course scrapCourse(String url) throws IOException {
+    /**
+     * Scrapes a given source url and return a Course object with all wanted data. Keeps a log of progress.
+     *
+     * The excessive try-catch blocks are used for debugging and logging purposes
+     * @param url String
+     * @return <class>Course</class> object
+     * @throws IOException
+     */
+    public static Course scrapeCourse(String url) throws IOException {
         String title = "", id = "", credits = "", description = "", prereq = "", coreq = "", notes = "", faculty = "",
                 restrictions = "", terms = "", profs = "";
 
@@ -105,12 +113,26 @@ public class Scrapper {
                 String text = element.selectFirst("p").text();
 
                 if (text.startsWith("Prereq")) {
-                    prereq += text.split(":")[1] + " | ";    // Get Prerequisites
-                } else if (text.startsWith("Coreq")) {
+                    // This try-catch is present to catch typos in prerequisite patterns where (:) is not present
+                    try{
+                        prereq += text.split(":")[1] + " | ";    // Get Prerequisites
+                    }
+                    catch (Exception e){
+                        prereq += text.replace(text.split(" ")[0] + " ", "");
+                        log("Course " + counter + ": Prevented Prerequisite misreading - " + e.getMessage());
+                    }
+                }
+                else if (text.startsWith("Coreq")) {
                     coreq += text.split(":")[1] + " | ";     // Get Corequisites
-                } else if (text.startsWith("Restr")) {
-                    coreq += text.split(":")[1] + " | ";     // Get Restrictions
-                } else {
+                }
+                else if (text.startsWith("Restr")) {
+                    if(text.startsWith("Restricted")){
+                        restrictions += text; // To fix one exception I got during my tests
+                        log("Course " + counter + ": Prevented Restricted misreading");
+                    }
+                    else restrictions += text.split(":")[1] + " | ";     // Get Restrictions
+                }
+                else {
                     notes += text + " | ";                        // Get Additional Notes
                 }
             }
