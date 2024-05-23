@@ -13,10 +13,10 @@ public class Scrapper {
     private static String log = "";
 
     static void retrieveData(){
-        String baseURL = "https://www.mcgill.ca/study/2022-2023/courses/search?page=";
+        String baseURL = "https://www.mcgill.ca/study/2024-2025/courses/search?page=";
 
         try{
-            for (int i = 0; i <= 516; i++) {
+            for (int i = 516; i <= DatabaseBuilder.pagecap; i++) {
                 Document searchPage = Jsoup.connect(baseURL + i).get();
 
                 for(Element courseBox : searchPage.select("div.views-field-field-course-title-long")){

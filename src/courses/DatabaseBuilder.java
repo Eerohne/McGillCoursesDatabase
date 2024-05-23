@@ -10,9 +10,10 @@ import java.io.IOException;
  * Main class to build the Data files
  */
 public class DatabaseBuilder {
-    static final String fileName = "courses";
-    static final int coursecap = 10331;
-    static final String year = "2022-2023";
+    static final String fileName = "courses2425";
+    static final int coursecap = 10477;
+    static final int pagecap = 524;
+    static final String year = "2024-2025";
     static final String school = "McGill";
 
 
